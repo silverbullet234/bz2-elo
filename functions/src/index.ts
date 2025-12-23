@@ -1,3 +1,28 @@
+/**
+ * Example curl command to submit a match result:
+ * 
+ * curl -X POST https://us-central1-elo-bz2.cloudfunctions.net/submitMatchResult \
+ * -H "Content-Type: application/json" \
+ * -d '{
+ *   "winner": "1",
+ *   "durationSeconds": 1200,
+ *   "map": "Terra",
+ *   "score": 45,
+ *   "timestamp": "2023-10-27T10:00:00Z",
+ *   "team1": {
+ *     "commander": "CommanderA",
+ *     "faction": "Isdf",
+ *     "thugs": ["Thug1", "Thug2"],
+ *     "spendQuotient": 1.2
+ *   },
+ *   "team2": {
+ *     "commander": "CommanderB",
+ *     "faction": "Scion",
+ *     "thugs": ["Thug3", "Thug4"],
+ *     "spendQuotient": 0.9
+ *   }
+ * }'
+ */
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { z } from "zod";
