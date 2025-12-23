@@ -1,0 +1,21 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+main {
+  padding-top: 2rem;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.footer-left-aligned {
+  text-align: left;
+}
