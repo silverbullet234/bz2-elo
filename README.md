@@ -4,9 +4,12 @@ An ELO rating system and web viewer for "Battlezone 2" (BZ2) strategy games. Thi
 
 ## 🚀 Features
 
--   **ELO Calculation:** Advanced ELO algorithm considering team strengths, commander influence, and faction balance.
+-   **Rating Algorithms:** Supports multiple rating systems:
+    -   **Standard ELO:** Weighted formula considering team strengths, commander influence, and faction balance.
+    -   **Glicko-2:** Modern rating system incorporating rating deviation (RD) and volatility.
+    -   **OpenSkill (TrueSkill):** Bayesian rating system designed specifically for team games, estimating player skill distributions (Mean & Variance).
 -   **Data Parsing:** Scripts to transform raw game logs into structured data.
--   **Web Viewer:** React-based dashboard to view Commander and Thug leaderboards.
+-   **Web Viewer:** React-based dashboard to view Commander and Thug leaderboards, switching between rating systems.
 -   **Cloud Integration:** Powered by Firebase (Firestore & Functions).
 -   **Static Analysis:** Tools to analyze faction win rates and game balance.
 
@@ -14,7 +17,7 @@ An ELO rating system and web viewer for "Battlezone 2" (BZ2) strategy games. Thi
 
 -   `elo-viewer/`: React frontend application.
 -   `functions/`: Firebase Cloud Functions for data submission and processing.
--   `scripts/`: TypeScript utilities for ELO calculation and data analysis.
+-   `scripts/`: TypeScript utilities for rating calculation and data analysis.
 -   `data/`: Raw and processed game data JSON files.
 
 ## 🚦 Getting Started
@@ -51,6 +54,8 @@ npm start
 The scripts are located in the `scripts/` directory and can be executed with `ts-node`:
 
 -   **Calculate ELOs:** `npx ts-node scripts/elo_calculator.ts`
+-   **Calculate Glicko-2:** `npx ts-node scripts/glicko_calculator.ts`
+-   **Calculate OpenSkill:** `npx ts-node scripts/openskill_calculator.ts`
 -   **Static Analysis:** `npx ts-node scripts/static_analysis.ts`
 
 ## 📊 ELO Methodology
@@ -61,6 +66,8 @@ The system uses a weighted ELO formula:
 Ratings are split into two categories:
 1.  **Commander ELO**: Reflects the player's performance leading the base.
 2.  **Thug ELO**: Reflects the player's performance as a field combatant.
+
+*Note: Glicko-2 and OpenSkill methodologies are also implemented to provide comparative insights.*
 
 ## 🤝 Contributing
 

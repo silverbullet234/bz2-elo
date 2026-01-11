@@ -1,39 +1,101 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import EloTable from './EloTable';
+import GlickoTable from './GlickoTable';
+import OpenSkillTable from './OpenSkillTable';
 
 function App() {
+  const [viewMode, setViewMode] = useState<'elo' | 'glicko' | 'openskill'>('elo');
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>Battlezone 2 Strat ELO Ratings</h1>
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={() => setViewMode('elo')} 
+            disabled={viewMode === 'elo'}
+            style={{ marginRight: '10px' }}
+          >
+            Standard Elo
+          </button>
+          <button 
+            onClick={() => setViewMode('glicko')} 
+            disabled={viewMode === 'glicko'}
+            style={{ marginRight: '10px' }}
+          >
+            Glicko-2
+          </button>
+          <button 
+            onClick={() => setViewMode('openskill')} 
+            disabled={viewMode === 'openskill'}
+          >
+            OpenSkill (TrueSkill)
+          </button>
+        </div>
       </header>
       <main>
-        <EloTable />
+        {viewMode !== 'elo' && (
+          <p style={{ color: 'red', fontWeight: 'bold', marginTop: '20px' }}>
+            DISCLAIMER: These numbers are preliminary and have not been verified.
+          </p>
+        )}
+        {viewMode === 'elo' && <EloTable />}
+        {viewMode === 'glicko' && <GlickoTable />}
+        {viewMode === 'openskill' && <OpenSkillTable />}
       </main>
       <footer className="footer-left-aligned">
         <p>Last Updated: Dec 21 2025</p>
         <p>
-          These scores were calculated from ~700 games (raw data: <a href="https://bz2stats.us/data/data.json" target="_blank" rel="noopener noreferrer">https://bz2stats.us/data/data.json</a>), using an Elo rating system.
+          These scores were calculated from ~700 games (raw data: <a href="https://bz2stats.us/data/data.json" target="_blank" rel="noopener noreferrer">https://bz2stats.us/data/data.json</a>), using a {viewMode === 'elo' ? 'Elo' : viewMode === 'glicko' ? 'Glicko-2' : 'OpenSkill'} rating system.
         </p>
-        <p>
-          <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank" rel="noopener noreferrer">https://en.wikipedia.org/wiki/Elo_rating_system</a>
-        </p>
-        <p>
-          Each team is assigned a power score based on the following:
-        </p>
-        <p>
-          P = (w * C) + ((1 - w) * T_avg)
-        </p>
-        <ul>
-          <li>P: The total team power or rating.</li>
-          <li>C: The Commander's current rating.</li>
-          <li>T_avg: The average rating of all Thugs on the team.</li>
-          <li>w: A weight between 0 and 1 (for example, 0.4 if the Commander represents 40% of the team's total "power").</li>
-        </ul>
-        <p>
-          After the power scores are assigned, a standard Elo rating is assigned. All players from the team share the same update in Elo (up or down) from an individual game.
-        </p>
+        
+        {viewMode === 'elo' && (
+          <>
+            <p>
+              <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank" rel="noopener noreferrer">https://en.wikipedia.org/wiki/Elo_rating_system</a>
+            </p>
+            <p>
+              Each team is assigned a power score based on the following:
+            </p>
+            <p>
+              P = (w * C) + ((1 - w) * T_avg)
+            </p>
+            <ul>
+              <li>P: The total team power or rating.</li>
+              <li>C: The Commander's current rating.</li>
+              <li>T_avg: The average rating of all Thugs on the team.</li>
+              <li>w: A weight between 0 and 1 (for example, 0.4 if the Commander represents 40% of the team's total "power").</li>
+            </ul>
+            <p>
+              After the power scores are assigned, a standard Elo rating is assigned. All players from the team share the same update in Elo (up or down) from an individual game.
+            </p>
+          </>
+        )}
+
+        {viewMode === 'openskill' && (
+          <>
+            <p>
+              <a href="https://github.com/philihp/openskill.js" target="_blank" rel="noopener noreferrer">https://github.com/philihp/openskill.js</a>
+            </p>
+            <p>
+              OpenSkill is an implementation of the Weng-Lin Bayesian rating system, similar to TrueSkill. It is designed specifically for team-based games.
+            </p>
+            <p>
+              Unlike the standard Elo implementation used here, OpenSkill natively understands that a team is composed of multiple players with different skill levels and uncertainties. It updates the rating of each player on a team based on the team's collective performance and the uncertainty of each player's rating.
+            </p>
+            <p>
+              <b>Rating (Ordinal):</b> This is the conservative estimate of skill (Mu - 3 * Sigma). It represents the skill level the system is 99% confident you are at least at.
+            </p>
+            <p>
+              <b>Mean (μ):</b> The estimated average skill level.
+            </p>
+            <p>
+              <b>Uncertainty (σ):</b> The system's confidence in the rating. Lower is better/more confident. New players start with high uncertainty.
+            </p>
+          </>
+        )}
+
         <p>
           Notable drawbacks that contribute to inaccuracies:
         </p>

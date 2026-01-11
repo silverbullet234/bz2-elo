@@ -7,10 +7,13 @@ This project was developed to analyze game data from "Battlezone 2", calculate p
 The main tasks accomplished in this project are:
 
 1.  **Data Parsing:** A script was created to parse raw game data from a JSON file into a structured format.
-2.  **ELO Calculation:** An ELO calculation utility was developed to determine player ratings based on game outcomes. The utility considers commander and thug roles separately, team composition, and faction advantages.
+2.  **ELO/Rating Calculation:** multiple rating utilities were developed:
+    *   **Standard ELO:** Considers commander and thug roles separately, team composition, and faction advantages.
+    *   **Glicko-2:** Implements rating deviation and volatility for better accuracy.
+    *   **OpenSkill (TrueSkill):** A Bayesian rating system optimized for team-based games.
 3.  **Static Analysis:** Several scripts were created to perform static analysis on the game data, including calculating faction win rates and analyzing team balance.
-4.  **Web Application:** A React web application was built to display the calculated ELO ratings for commanders and thugs. The app is hosted on Firebase Hosting.
-5.  **Database Integration:** The calculated ELO ratings are stored in a Firestore database.
+4.  **Web Application:** A React web application was built to display the calculated ELO/Rating tables. It supports switching between Elo, Glicko-2, and OpenSkill views. The app is hosted on Firebase Hosting.
+5.  **Database Integration:** The calculated ratings are stored in a Firestore database (collections: `elos`, `glicko_elos`, `openskill`).
 
 ## Components
 
@@ -25,18 +28,26 @@ The main tasks accomplished in this project are:
 ### Scripts (`scripts/` directory)
 
 *   `elo-games-parser.ts`: Parses raw game data from a JSON file (`games.json` or `sample_games.json`) and creates a structured `games.ts` file.
-*   `elo_calculator.ts`: Calculates player ELO ratings based on the games in `games.ts`. It reads initial ELOs, processes all games, and writes the updated ELOs to Firestore.
+*   `elo_calculator.ts`: Calculates standard ELO ratings based on the games in `games.ts`.
+*   `glicko_calculator.ts`: Calculates Glicko-2 ratings.
+*   `openskill_calculator.ts`: Calculates OpenSkill (TrueSkill-like) ratings, treating teams as aggregations of player skills.
 *   `static_analysis.ts`: Calculates and displays the win rates for each faction matchup.
 *   `balance_checker.ts`: Analyzes team balance by counting the number of games with an unequal number of thugs on each team and calculating the win rate for the team with more thugs.
 *   `player_analysis.ts`: Provides a detailed analysis of a specific player, including their ELO, win/loss record, and potential reasons for discrepancies between their ELO and win rate.
 
 ### Web App (`elo-viewer/` directory)
 
-A React application created with `create-react-app` that displays the commander and thug ELO ratings in sortable tables. The app fetches the ELO data from the Firestore database.
+A React application created with `create-react-app` that displays the commander and thug ratings in sortable tables.
+*   **Features:** Toggle between Standard Elo, Glicko-2, and OpenSkill views.
+*   **Data Source:** Fetches data from Firestore collections.
+*   **Hosting:** Deployed to Firebase Hosting.
 
 ### Firebase Integration
 
-*   **Firestore:** A NoSQL database used to store the calculated ELO ratings for commanders and thugs.
+*   **Firestore:** A NoSQL database used to store the calculated ratings.
+    *   `elos`: Standard ELO ratings.
+    *   `glicko_elos`: Glicko-2 ratings (Rating, RD, Volatility).
+    *   `openskill`: OpenSkill ratings (Mu, Sigma, Ordinal).
 *   **Firebase Hosting:** The React web app is hosted on Firebase Hosting.
 
 ## Methodology
@@ -62,13 +73,20 @@ After each game, the ELO ratings of the players are updated based on the outcome
 
 The K-factor determines how much the ELO changes after each game.
 
+### OpenSkill (TrueSkill)
+
+The `openskill_calculator.ts` script uses the `openskill` library (Weng-Lin algorithm). Unlike the ad-hoc team strength formula in the ELO script, OpenSkill natively handles team vs. team matches. It models each player's skill as a Gaussian distribution with a mean ($\mu$) and standard deviation ($\sigma$).
+
+*   **Update:** When a team wins, the system updates the $\mu$ and $\sigma$ for all players involved to maximize the likelihood of the observed outcome.
+*   **Ranking:** Players are ranked by their "Ordinal Rating" ($\mu - 3\sigma$), which is a conservative estimate of their skill (99% confidence).
+
 ### Static Analysis
 
 The static analysis scripts (`static_analysis.ts` and `balance_checker.ts`) read the structured game data from `games.ts` and perform calculations to provide insights into the game data, suchando faction win rates and team balance statistics.
 
 ### Web App
 
-The React app in the `elo-viewer` directory fetches the ELO data directly from the Firestore database. It uses the Firebase Web SDK to connect to Firestore and retrieve the `commanders` and `thugs` documents from the `elos` collection. The data is then displayed in sortable tables for easy viewing.
+The React app in the `elo-viewer` directory fetches the rating data directly from the Firestore database. It uses the Firebase Web SDK to connect to Firestore and retrieve documents from the relevant collections.
 
 ## How to Use
 

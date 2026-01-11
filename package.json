@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "firebase-admin": "^13.6.0",
+    "openskill": "^4.1.0",
     "typescript": "^5.9.3"
   }
 }

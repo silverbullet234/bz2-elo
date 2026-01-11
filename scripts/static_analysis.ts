@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { Game } from './game_interface';
 
 interface Matchup {
@@ -13,7 +14,7 @@ interface Matchup {
 
 const matchups: Matchup = {};
 
-const fileContent = fs.readFileSync('../data/games.ts', 'utf-8');
+const fileContent = fs.readFileSync(path.join(__dirname, '../data/games.ts'), 'utf-8');
 const gamesJson = fileContent.substring(fileContent.indexOf('[')).replace('];', ']');
 const games: Game[] = JSON.parse(gamesJson);
 

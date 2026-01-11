@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { Game } from './game_interface';
 import admin from 'firebase-admin';
 
@@ -11,7 +12,7 @@ interface PlayerElos {
   thugLosses: number;
 }
 
-const kFactor = 50;
+const kFactor = 80;
 const commanderInfluenceFactor = 0.5;
 
 interface FactionAdjustments {
@@ -196,10 +197,10 @@ export function calculateExpectedOutcome(
 }
 
 async function main() {
-    readElos('../data/commander_elos.js', 'commander');
-    readElos('../data/thug_elos.js', 'thug');
+    readElos(path.join(__dirname, '../data/commander_elos.js'), 'commander');
+    readElos(path.join(__dirname, '../data/thug_elos.js'), 'thug');
 
-    const rawData = fs.readFileSync('../data/games.ts', 'utf-8');
+    const rawData = fs.readFileSync(path.join(__dirname, '../data/games.ts'), 'utf-8');
     const gamesJson = rawData.substring(rawData.indexOf('[')).replace('];', ']');
     const games: Game[] = JSON.parse(gamesJson);
 
